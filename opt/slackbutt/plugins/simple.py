@@ -164,7 +164,7 @@ def manatee_maybe(message):
     if msg == msg.upper() and len(msg) > 4 and msg.lower() not in nicks:
         manatee = random.randint(1, 34)
         if manatee == 34:
-            reply = 'http://i.imgur.com/jxvgPhV.jpg'
+            reply = 'https://cdn.meme.am/cache/instances/folder898/65169898.jpg'
         else:
             reply = 'http://calmingmanatee.com/img/manatee%s.jpg' % manatee
     else:
