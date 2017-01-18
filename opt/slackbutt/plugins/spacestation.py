@@ -76,7 +76,7 @@ class SpaceStation():
         return reply
 
 
-ISS_STRING = r'''iss[^\?$]((-?[\d]+\.[\d]+)[,]?\s(-?[\d]+\.[\d]+))?'''
+ISS_STRING = r'''^iss[^\?$]?((-?[\d]+\.[\d]+)[,]?\s(-?[\d]+\.[\d]+))?'''
 ISS = re.compile(ISS_STRING, re.IGNORECASE)
 
 
