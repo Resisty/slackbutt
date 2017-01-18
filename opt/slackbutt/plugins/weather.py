@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
 # =======================================
 #
@@ -51,9 +52,9 @@ WEATHER = re.compile(WEATHERSTRING, re.IGNORECASE|re.VERBOSE)
 def list_issues(message, *groups):
     location = groups[0]
     wbot = WeatherBot()
-    msg = 'Next %s 3-hour weathers for %s\n' % (wbot.num, location)
+    msg = u'Next %s 3-hour weathers for %s\n' % (wbot.num, location)
     for weather in wbot.weather_at(location):
-        msg += ('%s (%sF)\n'
+        msg += (u'%s (%sºF)\n'
                 % (weather.get_detailed_status(),
                    weather.get_temperature('fahrenheit')['temp']))
     message.reply(msg)
