@@ -7,7 +7,7 @@
 #
 #  Creation Date : 03-05-2015
 #
-#  Last Modified : Sun 22 May 2016 07:39:35 PM CDT
+#  Last Modified : Mon 10 Apr 2017 11:39:48 AM CDT
 #
 #  Created By : Brian Auron
 #
@@ -94,7 +94,8 @@ class BridgeAPI(object):
                     yield '%s bridge was %s at %s!' % (bridge.capitalize(),
                                                        event,
                                                        event_time)
-            except requests.exceptions.HTTPError:
+            except (requests.exceptions.HTTPError,
+                    requests.exceptions.ConnectionError):
                 continue
     def _get(self):
         r = requests.get(url=self._url+self._uri,
