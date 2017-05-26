@@ -82,6 +82,8 @@ ISS = re.compile(ISS_STRING, re.IGNORECASE)
 
 @slackbot.bot.respond_to(ISS)
 def do_iss(message, *groups):
+    '''@mention with a request for when the ISS will be at given coordinates
+Examples: @bot iss iss -122.5, 45.4'''
     print "someone asked about the international space station!"
     try:
         longitude, latitude = groups[1], groups[2]
@@ -98,6 +100,9 @@ WHEREIS = re.compile(WHEREIS_STRING, re.IGNORECASE)
 
 @slackbot.bot.respond_to(WHEREIS)
 def do_where_is_iss(message, *groups):
+    '''@mention the bot and ask about the ISS
+Examples: @bot iss?
+          @bot where is the iss?'''
     iss = SpaceStation()
     msg = iss.current_location()
     message.reply(msg)

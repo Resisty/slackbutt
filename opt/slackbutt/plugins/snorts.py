@@ -7,7 +7,7 @@
 #
 #  Creation Date : 03-05-2015
 #
-#  Last Modified : Thu 07 Apr 2016 03:25:44 PM CDT
+#  Last Modified : Fri 26 May 2017 12:39:17 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -90,6 +90,9 @@ SNORTSTRING = r'''snort\s
 SNORT = re.compile(SNORTSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(SNORT)
 def snort_me(message, *groups):
+    '''@mention with a request to add a snort for a user
+Examples: @bot snort me
+          @bot snort user1234'''
     who = groups[0]
     if who == 'me':
         who = user(message)
@@ -105,6 +108,8 @@ SHOWSNORTSTRING = r'''show\ssnorts'''
 SHOWSNORT = re.compile(SHOWSNORTSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(SHOWSNORT)
 def show_snorts(message):
+    '''@mention with a request to show snorts
+Example: @bot show snorts'''
     day = datetime.date.today()
     rows = Snorts.select().where(Snorts.day == day)
     results = []
@@ -119,6 +124,9 @@ COUNTINGSTRING = r'''^([\w\.-]+)
 COUNTING = re.compile(COUNTINGSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(COUNTING)
 def count_update(message, *groups):
+    '''Increment or decrement something
+Examples: a++
+          counting--'''
     key, delta = groups
     key = key.lower()
     delta = {'++': 1, '--': -1}[delta]
@@ -144,6 +152,9 @@ DELCOUNTSTRING = r'''delete\s
 DELCOUNT = re.compile(DELCOUNTSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(DELCOUNT)
 def count_delete(message, *groups):
+    '''@mention with a request to delete a counter. Counter's value \
+must be 0.
+Example: @bot delete counting'''
     key = groups[0]
     key = key.lower()
     try:
@@ -160,6 +171,8 @@ GETCOUNTSTRING = r'''print\s
 GETCOUNT = re.compile(GETCOUNTSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(GETCOUNT)
 def count_get(message, *groups):
+    '''@mention with a request to print a counter by name.
+Example: @bot print counting'''
     key = groups[0]
     key = key.lower()
     try:
@@ -171,6 +184,8 @@ GETCOUNTS_STRING = r'''list\scounts'''
 GETCOUNTS = re.compile(GETCOUNTS_STRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(GETCOUNTS)
 def count_list(message):
+    '''@mention with a request to list counters.
+Example: @bot list counts'''
     try:
         message.reply(', '.join([i.key for i in Counts.select()]))
     except peewee.DoesNotExist:

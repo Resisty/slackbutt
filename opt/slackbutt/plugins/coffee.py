@@ -7,7 +7,7 @@
 #
 #  Creation Date : 21-03-2016
 #
-#  Last Modified : Mon 21 Mar 2016 03:01:54 PM CDT
+#  Last Modified : Fri 26 May 2017 12:28:26 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -22,6 +22,8 @@ COFFEESTRING = r'''(coffee|good sludge|fresh pot!)'''
 COFFEE = re.compile(COFFEESTRING, re.IGNORECASE)
 @slackbot.bot.listen_to(COFFEE)
 def coffee(message, *groups):
+    '''Just mention coffee or the good sludge or a fresh pot in the bot's \
+presence.'''
     strings = ['When I am drinking coffee, I always say, "I am going to have another sip of that!" after every sip.',
                'When I wake up in the morning, the first thing I do is stick my head out my window and yell, "Now it is time for me to drink coffee, the bean-based drink that you can find at the store!"',
                'I refer to the act of drinking coffee as "getting my sludge on."',

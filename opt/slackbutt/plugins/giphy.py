@@ -10,6 +10,8 @@ GIPHY_SEARCH_URL = 'http://api.giphy.com/v1/gifs/search'
 
 @slackbot.bot.listen_to(re.compile('^giphy (.*)$', re.I))
 def giphy(message, query):
+    '''Request a giphy search. Results are weighted for relevance.
+Example: giphy your mom'''
     params = {'q': query, 'api_key': GIPHY_API_KEY}
     response = requests.get(GIPHY_SEARCH_URL, params=params)
     if not response.ok:

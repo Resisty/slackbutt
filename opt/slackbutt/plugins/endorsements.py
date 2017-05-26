@@ -114,6 +114,9 @@ ENDORSE_STRING = r'''endorse\s<@([A-Z0-9]+)>(\sfor)?\s(.*)'''
 ENDORSE = re.compile(ENDORSE_STRING, re.I|re.X)
 @slackbot.bot.respond_to(ENDORSE)
 def do_endorse(msg, *groups):
+    '''@mention to endorse a user (by @mention) for something
+Example: @bot endorse @user1234 for endorsements
+Quoted endorsements are considered separate from unquoted'''
     print 'Got an endorsement request'
     endorser = msg._get_user_id()
     endorsee = groups[0]
@@ -134,6 +137,8 @@ ENDORSE_LIST_STRING = r'''list\sendorsements((\sfor)?\s<@([A-Z0-9]+)>)?'''
 ENDORSE_LIST = re.compile(ENDORSE_LIST_STRING, re.I|re.X)
 @slackbot.bot.respond_to(ENDORSE_LIST)
 def list_endorse(msg, *groups):
+    '''@mention to list endorsements for a user
+Example: @bot list endorsements for @user1234'''
     endorsements = get_endorsements(msg, groups[2])
     reply = '```\n'
     for slacker, endo_dict in endorsements.items():

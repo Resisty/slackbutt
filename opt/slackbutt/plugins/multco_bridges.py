@@ -7,13 +7,14 @@
 #
 #  Creation Date : 03-05-2015
 #
-#  Last Modified : Mon 10 Apr 2017 11:39:48 AM CDT
+#  Last Modified : Fri 26 May 2017 11:00:37 AM CDT
 #
 #  Created By : Brian Auron
 #
 # ========================================
 import yaml
 import json
+import logging
 import dateutil.parser as dateparser
 import dateutil.tz as tz
 import requests
@@ -95,7 +96,9 @@ class BridgeAPI(object):
                                                        event,
                                                        event_time)
             except (requests.exceptions.HTTPError,
-                    requests.exceptions.ConnectionError):
+                    requests.exceptions.ConnectionError,
+                    KeyError) as err:
+                logging.info(err)
                 continue
     def _get(self):
         r = requests.get(url=self._url+self._uri,

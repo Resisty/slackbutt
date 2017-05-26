@@ -50,6 +50,8 @@ WEATHERSTRING = r'''weather\s(.*)'''
 WEATHER = re.compile(WEATHERSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(WEATHER)
 def list_issues(message, *groups):
+    '''@mention with a request for the weather somewhere.
+Example: @bot weather Hell'''
     location = groups[0]
     wbot = WeatherBot()
     msg = u'Next %s 3-hour weathers for %s\n' % (wbot.num, location)

@@ -16,6 +16,9 @@ class QueryParam(object):
 
 @slackbot.bot.listen_to(re.compile('^(image|animate) (.*)$', re.I))
 def imgur(message, *groups):
+    '''Request images (still or animated) from imgur.
+Example: image butts
+         animate butts'''
     q_type = QueryParam.from_type(groups[0])
     query = groups[1]
     params = {'q': query}

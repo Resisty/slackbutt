@@ -7,7 +7,7 @@
 #
 #  Creation Date : 27-03-2016
 #
-#  Last Modified : Tue 29 Mar 2016 05:28:59 PM CDT
+#  Last Modified : Fri 26 May 2017 12:34:59 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -50,6 +50,11 @@ LISTISSUESTRING = r'''github\slist\sissues?
 LISTISSUES = re.compile(LISTISSUESTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(LISTISSUES)
 def list_issues(message, *groups):
+    '''@mention and request a list of issues, optionally by status
+Examples: @bot list issues
+          @bot list issues closed
+          @bot list issues open
+          @bot list issues open expanded'''
     param = groups[0]
     expanded = groups[1]
     params = {}
@@ -73,6 +78,9 @@ CREATEISSUESTRING = r'''github\screate\sissue\s
 CREATEISSUE = re.compile(CREATEISSUESTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(CREATEISSUE)
 def create_issue(message, *groups):
+    '''@mention and request a new github issue by title and body
+Examples: @bot github create issue title "butts" body "hahahaha butts, right?"
+          @bot github create issue "butts" "hahahaha butts, right?"'''
     title = groups[2].strip('"')
     body = groups[5].strip('"')
     resp = Issue().create(title, body)
