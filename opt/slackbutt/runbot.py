@@ -7,7 +7,7 @@
 #
 #  Creation Date : 18-03-2016
 #
-#  Last Modified : Tue 24 May 2016 08:48:23 AM CDT
+#  Last Modified : Wed 07 Jun 2017 05:22:26 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -46,7 +46,11 @@ def bridge_vomit(bot, bridgeapi):
             return
         for msg in bridgeapi.sse:
             if str(msg) != '':
-                bot._client.send_message(channel, msg)
+                try:
+                    bot._client.send_message(channel, msg)
+                except HTTPError:
+                    time.sleep(10) # Give slack a chance recover
+                    continue
 
 def botrun(bot):
     bot.run()
