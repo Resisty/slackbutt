@@ -7,7 +7,7 @@
 #
 #  Creation Date : 21-03-2016
 #
-#  Last Modified : Fri 26 May 2017 12:28:26 PM CDT
+#  Last Modified : Mon 03 Jul 2017 02:15:25 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -18,7 +18,7 @@ import re
 import random
 import traceback
 
-COFFEESTRING = r'''(coffee|good sludge|fresh pot!)'''
+COFFEESTRING = r'''(covfefe|coffee|good sludge|fresh pot!)'''
 COFFEE = re.compile(COFFEESTRING, re.IGNORECASE)
 @slackbot.bot.listen_to(COFFEE)
 def coffee(message, *groups):
