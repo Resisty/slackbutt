@@ -7,7 +7,7 @@
 #
 #  Creation Date : 03-05-2015
 #
-#  Last Modified : Sat 29 Jul 2017 01:15:15 PM CDT
+#  Last Modified : Sat 29 Jul 2017 02:23:54 PM CDT
 #
 #  Created By : Brian Auron
 #
@@ -171,7 +171,11 @@ Examples: a += 3
         except peewee.IntegrityError:
             psql_db.connect() # not entirely sure why this is necessary but it is
             count = Counts.get(Counts.key == key)
-        count.count = oper(count.count, int(amount))
+        try:
+            count.count = oper(count.count, int(amount))
+        except ZeroDivisionError:
+            message.reply('You can\'t divide by zero, stupid!')
+            return
         count.save()
     message.reply('%s is now %s' % (key, count.count))
 

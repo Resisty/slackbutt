@@ -73,6 +73,7 @@ def user(msg):
 def users(msg):
     return {i:j for i, j in msg._client.users.items()}
 
+@connect
 def endorse(endorser_sid, endorsee_sid, skill):
     try:
         _skill, _ = Skill.get_or_create(key=skill)
@@ -89,6 +90,7 @@ Sorry! Try again!')
     except peewee.IntegrityError:
         raise EndorsementExistsError('Cannot endorse twice!')
 
+@connect
 def get_endorsements(msg, slack_id=None):
     q = (Endorsement
          .select(Endorsement.endorsee,
