@@ -7,7 +7,7 @@
 #
 #  Creation Date : 03-05-2015
 #
-#  Last Modified : Sat 29 Jul 2017 02:23:54 PM CDT
+#  Last Modified : Thu 10 Aug 2017 11:12:14 AM CDT
 #
 #  Created By : Brian Auron
 #
@@ -149,7 +149,7 @@ Examples: a++
     message.reply('%s is now %s' % (key, count.count))
 
 ARITHMETICSTRING = r'''^([\w\.-]+)\s
-                     ([+\-\*/])=\s
+                     ([+\-\*/%])=\s
                      (-?\d+)$'''
 ARITHMETIC = re.compile(ARITHMETICSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(ARITHMETIC)
@@ -164,7 +164,8 @@ Examples: a += 3
     oper = {'+': operator.add,
              '-': operator.sub,
              '*': operator.mul,
-             '/': operator.floordiv}[oper]
+             '/': operator.floordiv,
+             '%': operator.mod}[oper]
     with psql_db.atomic():
         try:
             count = Counts.create(key = key, count = 0)
