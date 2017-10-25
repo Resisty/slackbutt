@@ -185,7 +185,7 @@ HADDAWAYSTRING = r'''(|,)\s
                      what\sis\slove\?*$'''
 HADDAWAY = re.compile(HADDAWAYSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(HADDAWAY)
-def what_is_love(message):
+def what_is_love(message, *groups):
     '''Use a string containing the format:
 r'(|,) what is love?*$
 Example: Hey, what is love?'''
