@@ -19,6 +19,7 @@ import re
 import random
 import traceback
 import six
+import giphy
 
 def user(msg):
     return msg._client.users[message._get_user_id()]['name']
@@ -241,6 +242,13 @@ ENHANCE = re.compile(ENHANCESTRING, re.I)
 def enhance(message):
     '''Enhance!'''
     message.send('/me types furiously. "Enhance."')
+
+ACTUALLYSTRING = r'''actually'''
+ACTUALLY = re.compile(ACTUALLYSTRING, re.I)
+@slackbot.bot.listen_to(ACTUALLY)
+def enhance(message):
+    '''Actually...!'''
+    message.send('/giphy %s' % giphy.get_gif('actually'))
 
 @slackbot.bot.respond_to(re.compile('h[ae]lp', re.I))
 def explore(message, *groups):
