@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+""" Module for searching imgur
+"""
 import math
 import random
 import re
@@ -8,17 +11,20 @@ import slackbot.bot
 IMGUR_ID = '7fd4f416717f07d'
 IMGUR_URI = 'https://api.imgur.com/3/gallery/search'
 
-class QueryParam(object):
+class QueryParam:  # pylint: disable=too-few-public-methods
+    """ Convenience class/method for sending query parameters with imgur requests
+    """
     @classmethod
-    def from_type(cls, t):
+    def from_type(cls, img_type):
+        """ Create query parameters based on supported types
+        """
         return {'image': {'q_type': 'png'},
-                'animate': {'q_type': 'anigif'}}[t]
+                'animate': {'q_type': 'anigif'}}[img_type]
 
 @slackbot.bot.listen_to(re.compile('^(image|animate) (.*)$', re.I))
 def imgur(message, *groups):
-    '''Request images (still or animated) from imgur.
-Example: image butts
-         animate butts'''
+    """ Reply to a request to search imgur
+    """
     q_type = QueryParam.from_type(groups[0])
     query = groups[1]
     params = {'q': query}

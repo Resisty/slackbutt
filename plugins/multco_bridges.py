@@ -1,50 +1,41 @@
-#!/usr/bin/python
-# =======================================
-#
-#  File Name : multco_bridges.py
-#
-#  Purpose :
-#
-#  Creation Date : 03-05-2015
-#
-#  Last Modified : Fri 26 May 2017 11:00:37 AM CDT
-#
-#  Created By : Brian Auron
-#
-# ========================================
-import yaml
+#!/usr/bin/env python
+""" Module for using the Multnomah bridge api
+"""
 import json
 import logging
+import os
 import dateutil.parser as dateparser
 import dateutil.tz as tz
 import requests
-requests.packages.urllib3.disable_warnings()
-import os
 import sseclient
-
-#import slackbot.bot
-import peewee
+import yaml
 from playhouse.postgres_ext import PostgresqlExtDatabase
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(BASE_DIR, '../config.yml')
 with open(CONFIG, 'r') as fptr:
-    cfg = yaml.load(fptr.read())
-DBUSER = cfg['dbuser']
-DBPASS = cfg['dbpass']
-DB = cfg['db']
-MULTCO_TOKEN = cfg['multco_token']
+    CFG = yaml.load(fptr.read(), Loader=yaml.FullLoader)
+DBUSER = CFG['dbuser']
+DBPASS = CFG['dbpass']
+DB = CFG['db']
+MULTCO_TOKEN = CFG['multco_token']
 MULTCO_API = 'https://api.multco.us/bridges'
 
-psql_db = PostgresqlExtDatabase(DB, user=DBUSER, password=DBPASS)
+PSQL_DB = PostgresqlExtDatabase(DB, user=DBUSER, password=DBPASS)
 
-class PacificDate(object):
+class PacificDate:  # pylint: disable=too-few-public-methods
+    """ Class for ensuring datetimes are in Pacific tz
+    """
     @classmethod
-    def from_str(cls, s):
-        d = dateparser.parse(s).astimezone(tz.gettz('America/Los Angeles'))
-        return d
+    def from_str(cls, datestring):
+        """ Create a Pacific datetime from a string
+        """
+        date = dateparser.parse(datestring).astimezone(tz.gettz('America/Los Angeles'))
+        return date
 
-class BridgeAPI(object):
+class BridgeAPI:
+    """ Class for abstracting the Multnomah bridge api
+    """
     def __init__(self, token=MULTCO_TOKEN):
         self._token = token
         self._url = MULTCO_API
@@ -55,24 +46,34 @@ class BridgeAPI(object):
         self._sse = None
     @property
     def params(self):
+        """ Propertize api request params
+        """
         return self._params
     @params.setter
-    def params(self, p):
-        self._params.update(p)
+    def params(self, prms):
+        """ Override the api request params
+        """
+        self._params.update(prms)
         return self._params
     @property
     def headers(self):
+        """ Propertize the request headers
+        """
         return self._headers
     @headers.setter
-    def headers(self, h):
-        self._headers.update(h)
+    def headers(self, hdrs):
+        """ Override the request headers
+        """
+        self._headers.update(hdrs)
         return self._headers
     @property
     def sse(self):
+        """ Propertize the SSE client and its operation
+        """
         if not self._sse:
             self._sse = (sseclient
                          .SSEClient(self._url +
-                                    '/sse?access_token={%s}' % self._token))
+                                    '/sse?access_token={'+self._token+'}'))
         while True:
             try:
                 for msg in self._sse:
@@ -101,23 +102,27 @@ class BridgeAPI(object):
                 logging.info(err)
                 continue
     def _get(self):
-        r = requests.get(url=self._url+self._uri,
-                         headers=self._headers,
-                         params=self._params)
-        return r
+        req = requests.get(url=self._url+self._uri,
+                           headers=self._headers,
+                           params=self._params)
+        return req
     def _getjson(self):
         return self._get().json()
 
     @property
     def bridges(self):
+        """ Propertize bridges
+        """
         if not self._bridges:
             self._uri = ''
             self._bridges = self._getjson()
         return self._bridges
 
     def update_events(self):
+        """ Update bridge events from api
+        """
         for bridge in self.bridges:
-            self._uri = '/%s/events' % bridge['name']
+            self._uri = f"/{bridge['name']}/events"
             scheduled = self._getjson()['scheduledEvents']
             actual = self._getjson()['actualEvents']
             bridge['events'] = {'scheduled': sorted([PacificDate
@@ -129,14 +134,14 @@ class BridgeAPI(object):
         return self.bridges
 
     def pretty_events(self):
+        """ Create a pretty string for bridge information (for humans)
+        """
         bridges = self.update_events()
-        s = ''
+        bridge_string = ''
         for bridge in bridges:
-            s += '%s scheduled events:\n' % bridge['name']
+            bridge_string += f"{bridge['name']} scheduled events:\n"
             if bridge['events']['scheduled']:
-                s += ('\n'
-                      .join(['- %s' % str(i)
-                             for i in bridge['events']['scheduled']]))
+                bridge_string += ('\n'.join([f'- {str(i)}' for i in bridge['events']['scheduled']]))
             else:
-                s += 'None\n'
-        return s
+                bridge_string += 'None\n'
+        return bridge_string

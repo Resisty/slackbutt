@@ -23,7 +23,7 @@ import functools
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(BASE_DIR, '../config.yml')
 with open(CONFIG, 'r') as yml:
-    cfg = yaml.load(yml.read())
+    cfg = yaml.load(yml.read(), Loader=yaml.FullLoader)
 dbuser = cfg['dbuser']
 dbpass = cfg['dbpass']
 db = cfg['db']

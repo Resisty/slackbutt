@@ -1,27 +1,39 @@
+#!/usr/bin/env python
+""" Module for tracking the ISS
+"""
 
 import re
+import logging
+from datetime import datetime, timedelta
 import slackbot.bot
 import requests
-from datetime import datetime, timedelta
 
 URL = 'http://api.open-notify.org/iss-pass.json?lat={0}&lon={1}'
 LONGITUDE = -122.680372
 LATITUDE = 45.522005
 
 WHEREIS_URL = 'http://api.open-notify.org/iss-now.json'
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.StreamHandler)
 
 
 class SpaceStation():
+    """ Class for using ISS api
+    """
     def __init__(self, longitude=LONGITUDE, latitude=LATITUDE):
         self._longitude = longitude
         self._latitude = latitude
 
     @property
     def longitude(self):
+        """ Propertize longitude
+        """
         return self._longitude
 
     @property
     def latitude(self):
+        """ Propertize latitude
+        """
         return self._latitude
 
     @longitude.setter
@@ -33,46 +45,45 @@ class SpaceStation():
         self._latitude = latitude
 
     def next_pass(self):
+        """ Get next pass of ISS over location
+        """
         reply = "nobody knows anything about a space station"
         url = URL.format(self._latitude, self._longitude)
         data = requests.get(url)
         if data.status_code == 200:
             api_response = data.json()
-            if (api_response['message'] == 'success'):
+            if api_response['message'] == 'success':
                 next_rise_time = api_response['response'][0]['risetime']
                 next_duration = api_response['response'][0]['duration']
-                dt = datetime.fromtimestamp(next_rise_time)
-                done = dt + timedelta(seconds=next_duration)
-                reply = "Next pass from {0} until {1}".format(
-                    dt, done)
+                nrt_datetime = datetime.fromtimestamp(next_rise_time)
+                done = nrt_datetime + timedelta(seconds=next_duration)
+                reply = f"Next pass from {nrt_datetime} until {done}"
             else:
-                print "had problem with api not success"
+                LOGGER.info("had problem with api not success")
 
         else:
-            print "status code for request '{0}' was {1}".format(
-                url,
-                data.status_code)
+            LOGGER.info("status code for request '%s' was %s", url, data.status_code)
             api_response = data.json()
-            if (api_response['message'] == 'failure'):
+            if api_response['message'] == 'failure':
                 reply = api_response['reason']
         return reply
 
-    def current_location(self):
+    @staticmethod
+    def current_location():
+        """ Get current location of ISS
+        """
         reply = "nobody knows where it is"
         data = requests.get(WHEREIS_URL)
         if data.status_code == 200:
             api_response = data.json()
-            if (api_response['message'] == 'success'):
+            if api_response['message'] == 'success':
                 longitude = api_response['iss_position']['longitude']
                 latitude = api_response['iss_position']['latitude']
-                longstr = {True: "%s E", False: "%s W"}[longitude >= 0] % abs(
-                    float(longitude))
-                latstr = {True: "%s N", False: "%s W"}[latitude >= 0] % abs(
-                    float(latitude))
-                reply = "The ISS is at %s, %s" % (longstr, latstr)
+                longstr = f"{abs(float(longitude))} {'E' if longitude >= 0 else 'W'}"
+                latstr = f"{abs(float(latitude))} {'N' if latitude >= 0 else 'S'}"
+                reply = f"The ISS is at {longstr}, {latstr}"
         else:
-            print "status code for current location request was {1}".format(
-                data.status_code)
+            LOGGER.info("status code for current location request was %s", data.status_code)
         return reply
 
 
@@ -84,7 +95,7 @@ ISS = re.compile(ISS_STRING, re.IGNORECASE)
 def do_iss(message, *groups):
     '''@mention with a request for when the ISS will be at given coordinates
 Examples: @bot iss iss -122.5, 45.4'''
-    print "someone asked about the international space station!"
+    LOGGER.info("someone asked about the international space station!")
     try:
         longitude, latitude = groups[1], groups[2]
     except IndexError:
@@ -99,7 +110,7 @@ WHEREIS = re.compile(WHEREIS_STRING, re.IGNORECASE)
 
 
 @slackbot.bot.respond_to(WHEREIS)
-def do_where_is_iss(message, *groups):
+def do_where_is_iss(message, *groups):  # pylint: disable=unused-argument
     '''@mention the bot and ask about the ISS
 Examples: @bot iss?
           @bot where is the iss?'''
@@ -109,6 +120,5 @@ Examples: @bot iss?
 
 
 if __name__ == '__main__':
-    iss = SpaceStation(LONGITUDE, LATITUDE)
-#    print iss.next_pass()
-    print iss.current_location()
+    ISS = SpaceStation(LONGITUDE, LATITUDE)
+    LOGGER.info(ISS.current_location())

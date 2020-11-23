@@ -1,28 +1,22 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python
-# =======================================
-#
-#  File Name : plugins.py
-#
-#  Purpose :
-#
-#  Creation Date : 18-03-2016
-#
-#  Last Modified : Tue 12 Apr 2016 05:36:45 PM CDT
-#
-#  Created By : Brian Auron
-#
-# ========================================
+#!/usr/bin/env python
+""" Module for simple behaviors for the slack bot
+"""
 
-import slackbot.bot
 import re
 import random
 import traceback
 import six
-import giphy
+
+import slackbot.bot
+# pylint: disable=protected-access
 
 def user(msg):
-    return msg._client.users[message._get_user_id()]['name']
+    """ Return the user for a message
+
+        :param msg: Slack message
+    """
+    return msg._client.users[msg._get_user_id()]['name']
 
 SHENANISTRING = '''what's the name of that place you like with all the goofy\
  shit on the walls?'''
@@ -38,7 +32,7 @@ on the walls?'''
 
 HI = re.compile(r'hi(|!)$', re.IGNORECASE)
 @slackbot.bot.respond_to(HI)
-def hi(message, groups):
+def hi(message, groups):  # pylint: disable=unused-argument,invalid-name
     '''@mention with r'hi(|!)$'
 Example: @bot hi!'''
     message.reply('Yo!')
@@ -54,7 +48,7 @@ Example: hey, you're a towel, guy!'''
 PYTHONTOWELSTRING = '''you're a (bot|python|robot) towel'''
 PYTHONTOWEL = re.compile(PYTHONTOWELSTRING, re.IGNORECASE)
 @slackbot.bot.listen_to(PYTHONTOWEL)
-def towel(message):
+def ura(message):
     '''Use the string r'you\'re a (bot|python|robot) towel'
 Example: hey, you're a bot towel, buddy!'''
     message.reply('''What did you say?!''')
@@ -74,7 +68,7 @@ GROUPSTRING = r'''^roll\sdice
 GROUPS = re.compile(GROUPSTRING, re.IGNORECASE | re.VERBOSE)
 @slackbot.bot.respond_to(GROUPS)
 def roll_dice(message, *groups):
-    '''@mention with r'^roll\sdice
+    r'''@mention with r'^roll\sdice
                $|\s
                ((\s*[\d]+d[\d]+)+)
                ($|\swith\s.*\smodifier(|s)\s((\s*[\+-]\d+)+))'
@@ -84,10 +78,10 @@ Example: roll dice 1d4 2d6 with butts modifier +1'''
         try:
             modifiers = groups[4].split()
             modifiers = [int(m) for m in modifiers]
-        except AttributeError as e:
+        except AttributeError:
             modifiers = [0]
         if not dice:
-            total = random.randint(1,6)
+            total = random.randint(1, 6)
             results = ['1d6: %d' % total]
         else:
             dice_sets = dice.split()
@@ -102,15 +96,15 @@ Example: roll dice 1d4 2d6 with butts modifier +1'''
                 total += val
                 results.append('%s: %d' % (dice_set, val))
         results = ', '.join(results)
-        message.reply('''Got dice sets: %s\nTotal: %s''' % (results, total))
-    except:
-        print traceback.format_exc()
+        message.reply(f"Got dice sets: {results}\nTotal: {total}")
+    except:  # pylint: disable=bare-except
+        print(traceback.format_exc())
 
 SPINSTRING = r'''spin\sthe\swheel'''
 SPIN = re.compile(SPINSTRING, re.IGNORECASE | re.VERBOSE)
 @slackbot.bot.respond_to(SPIN)
 def spin_wheel(message):
-    '''@mention with r'spin\sthe\swheel.
+    r'''@mention with r'spin\sthe\swheel.
 Example: @bot spin the wheel'''
     values = range(5, 105, 5)
     message.reply(str(random.choice(values)))
@@ -139,8 +133,8 @@ WHELPS = re.compile(WHELPSTRING, re.IGNORECASE)
 def whelps(message):
     '''Use a string with 'whelps' in it.
 Example: I fucked up. #whelps'''
-    for i in ['WHELPS','LEFT SIDE','EVEN SIDE',
-              'MANY WHELPS','NOW','HANDLE IT!']:
+    for i in ['WHELPS', 'LEFT SIDE', 'EVEN SIDE',
+              'MANY WHELPS', 'NOW', 'HANDLE IT!']:
         message.reply(i)
 
 FIXITSTRING = '''fixit'''
@@ -151,7 +145,7 @@ def fixit(message):
 Example: You broked it. FIXIT'''
     message.reply('https://www.youtube.com/watch?v=8ZCysBT5Kec')
 
-FINESTRING = '''this\sis\sfine'''
+FINESTRING = r'''this\sis\sfine'''
 FINE = re.compile(FINESTRING, re.IGNORECASE)
 @slackbot.bot.listen_to(FINE)
 def this_is_fine(message):
@@ -163,7 +157,7 @@ GREATDAYSTRING = r'''(it's\sgonna\sbe\sa\s)*
                     great\sday'''
 GREATDAY = re.compile(GREATDAYSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(GREATDAY)
-def great_day(message, *groups):
+def great_day(message, *groups):  # pylint: disable=unused-argument
     '''Use a string with '(it\'s gonna be a )great day'
 Examples: You had a great day!
           It's gonna be a great day.'''
@@ -176,7 +170,7 @@ SPENDSTRING = r'''can\s
                      money'''
 SPEND = re.compile(SPENDSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(SPEND)
-def can_spend(message, *groups):
+def can_spend(message, *groups):  # pylint: disable=unused-argument
     '''Use a string containing the format:
 r'can .* spend (this|that|the) money'
 Example: Hey, can Brian spend that money?'''
@@ -186,7 +180,7 @@ HADDAWAYSTRING = r'''(|,)\s
                      what\sis\slove\?*$'''
 HADDAWAY = re.compile(HADDAWAYSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(HADDAWAY)
-def what_is_love(message, *groups):
+def what_is_love(message, *groups):  # pylint: disable=unused-argument
     '''Use a string containing the format:
 r'(|,) what is love?*$
 Example: Hey, what is love?'''
@@ -198,10 +192,10 @@ MANATEE = re.compile(MANATEESTRING)
 def manatee_maybe(message):
     '''Voice your anger.'''
     msg = message.body['text']
-    nicks = [j['name'] for i,j in message._client.users.items()]
+    nicks = [j['name'] for i, j in message._client.users.items()]
     if msg == msg.upper() and len(msg) > 4 and msg.lower() not in nicks:
         manatee = random.randint(1, 34)
-        reply = 'http://brianauron.info/img/manatees/manatee%s.jpg' % manatee
+        reply = 'http://brianauron.info.s3-website.us-west-2.amazonaws.com/img/manatees/manatee%s.jpg' % manatee
     else:
         return
     message.reply(reply)
@@ -240,33 +234,25 @@ def enhance(message):
     '''Enhance!'''
     message.send('/me types furiously. "Enhance."')
 
-ACTUALLYSTRING = r'''actually'''
-ACTUALLY = re.compile(ACTUALLYSTRING, re.I)
-@slackbot.bot.listen_to(ACTUALLY)
-def enhance(message):
-    '''Actually...!'''
-    message.send('/giphy %s' % giphy.get_gif('actually'))
-
 @slackbot.bot.respond_to(re.compile('h[ae]lp', re.I))
-def explore(message, *groups):
+def explore(message, *groups):  # pylint: disable=unused-argument
     '''@mention the bot with 'help' for this message.'''
-    udi = message._get_user_id()
+    udi = message._get_user_id()  # pylint: disable=protected-access
     name = message._client.users[udi]['name']
-    (message
+    (message  # pylint: disable=protected-access
      ._client
-     .send_message('@%s' % name,
+     .send_message('@{name}',
                    'Respond to:'))
-    (message
+    (message  # pylint: disable=protected-access
      ._client
-     .send_message('@%s' % name,
+     .send_message('@{name}',
                    message.docs_reply()))
-    (message
+    (message  # pylint: disable=protected-access
      ._client
-     .send_message('@%s' % name,
+     .send_message('@{name}',
                    'Listen to:'))
-    reply = [u'    • `{0}` {1}'.format(v.__name__, v.__doc__ or '')
-             for _, v in six.iteritems(message._plugins.commands['listen_to'])]
-    (message
+    reply = [f"    • `{v.__name__}` {v.__doc__ or ''}"
+             for _, v in six.iteritems(message._plugins.commands['listen_to'])]  # pylint: disable=protected-access
+    (message  # pylint: disable=protected-access
      ._client
-     .send_message('@%s' % name,
-                   u'\n'.join(reply)))
+     .send_message(f"@{name}", "\n".join(reply)))

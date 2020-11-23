@@ -5,4 +5,5 @@ bin/
 include/
 lib/
 local/
+venv/
 pip-selfcheck.json
