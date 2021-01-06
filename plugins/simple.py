@@ -241,15 +241,15 @@ def explore(message, *groups):  # pylint: disable=unused-argument
     name = message._client.users[udi]['name']
     (message  # pylint: disable=protected-access
      ._client
-     .send_message('@{name}',
+     .send_message(f'@{name}',
                    'Respond to:'))
     (message  # pylint: disable=protected-access
      ._client
-     .send_message('@{name}',
+     .send_message(f'@{name}',
                    message.docs_reply()))
     (message  # pylint: disable=protected-access
      ._client
-     .send_message('@{name}',
+     .send_message(f'@{name}',
                    'Listen to:'))
     reply = [f"    • `{v.__name__}` {v.__doc__ or ''}"
              for _, v in six.iteritems(message._plugins.commands['listen_to'])]  # pylint: disable=protected-access
