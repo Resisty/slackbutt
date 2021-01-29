@@ -10,6 +10,7 @@ import slackbot.bot
 
 EPOCH_YEAR = 2020
 EPOCH_MONTH = 3
+EPOCH_MONTH_EN = 'March'
 EPOCH_DAY = 12
 EPOCH = datetime.datetime(EPOCH_YEAR, EPOCH_MONTH, EPOCH_DAY)
 
@@ -19,17 +20,19 @@ def to_covid(a_datetime):
         :param a_datetime: datetime.datetime object
         :return: A very stupid string that resembles a date
     """
+    ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+    # Terse solution lovingly stolen from SO
+    # https://stackoverflow.com/a/20007730
     if a_datetime < EPOCH:
         diff = EPOCH - a_datetime
         diff_days = abs(0 - diff.days + 1)
-        sign = '-' if diff_days > 0 else ''
+        sign = 'negative' if diff_days > 0 else ''
     else:
         diff = a_datetime - EPOCH
         diff_days = EPOCH_DAY + diff.days
         sign = ''
     return (
-        f'Gregorian {a_datetime.strftime("%F")} is Covid date {sign}{EPOCH_YEAR}-{EPOCH_MONTH}-'
-        f'{diff_days}'
+        f'Gregorian {a_datetime.strftime("%F")} is Covid {EPOCH_MONTH_EN} {sign}{ordinal(diff_days)}, {EPOCH_YEAR}'
     )
 
 DATESTRING = r'''[wW]hat day( of TYOOL 2020)? is (.*)\?'''
