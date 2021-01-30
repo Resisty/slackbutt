@@ -18,6 +18,16 @@ EPOCH_MONTH_EN = 'March'
 EPOCH_DAY = 12
 EPOCH = datetime.datetime(EPOCH_YEAR, EPOCH_MONTH, EPOCH_DAY)
 
+def convertyear(year, century_specified=True):
+    """ Function for overriding dateutil.parser.parserinfo().convertyear so it doesn't disregard ancient years
+
+        :param year: Int year
+        :kwarg century_specified: whether or not the century has been specified in the year; defaults to False in
+            dateutil
+    """
+    assert year >= 0 # from source
+    return year
+
 def to_covid(a_datetime):
     """ Convert a datetime object from Gregorian to Covid
 
@@ -48,10 +58,12 @@ def covid_date(message, *groups):
         :param message: The string message
         :param *groups: Iterable of re.search().groups()
     """
+    parserinfo = parser.parserinfo()
+    parserinfo.convertyear = convertyear
     datestring_maybe = groups[1]
     LOGGER.info('Got a datestring, maybe: "%s"', datestring_maybe)
     try:
-        the_date = parser.parse(datestring_maybe)
+        the_date = parser.parse(datestring_maybe, parserinfo=parserinfo)
     except ValueError:
         message.reply(f'"{datestring_maybe}" isn\'t a valid date, ya jerk!')
         return
