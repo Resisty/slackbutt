@@ -6,7 +6,7 @@ import re
 import datetime
 import logging
 
-import dateparser
+from dateutil import parser
 import slackbot.bot
 
 LOGGER = logging.getLogger(__name__)
@@ -50,8 +50,9 @@ def covid_date(message, *groups):
     """
     datestring_maybe = groups[1]
     LOGGER.info('Got a datestring, maybe: "%s"', datestring_maybe)
-    the_date = dateparser.parse(datestring_maybe)
-    if not the_date:
+    try:
+        the_date = parser.parse(datestring_maybe)
+    except ValueError:
         message.reply(f'"{datestring_maybe}" isn\'t a valid date, ya jerk!')
-    else:
-        message.reply(to_covid(the_date))
+        return
+    message.reply(to_covid(the_date))
