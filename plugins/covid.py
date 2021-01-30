@@ -26,7 +26,7 @@ def to_covid(a_datetime):
     if a_datetime < EPOCH:
         diff = EPOCH - a_datetime
         diff_days = abs(0 - diff.days + 1)
-        sign = 'negative' if diff_days > 0 else ''
+        sign = '-' if diff_days > 0 else ''
     else:
         diff = a_datetime - EPOCH
         diff_days = EPOCH_DAY + diff.days
