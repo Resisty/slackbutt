@@ -44,5 +44,9 @@ def covid_date(message, *groups):
         :param message: The string message
         :param *groups: Iterable of re.search().groups()
     """
-    the_date = dateparser.parse(groups[1])
-    message.reply(to_covid(the_date))
+    datestring_maybe = groups[1]
+    the_date = dateparser.parse(datestring_maybe)
+    if not the_date:
+        message.reply(f'"{datestring_maybe}" isn\'t a valid date, ya jerk!')
+    else:
+        message.reply(to_covid(the_date))
