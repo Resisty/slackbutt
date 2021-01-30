@@ -4,9 +4,13 @@
 
 import re
 import datetime
+import logging
 
 import dateparser
 import slackbot.bot
+
+LOGGER = logging.getLogger(__name__)
+LOGGER.addHandler(logging.StreamHandler())
 
 EPOCH_YEAR = 2020
 EPOCH_MONTH = 3
@@ -45,6 +49,7 @@ def covid_date(message, *groups):
         :param *groups: Iterable of re.search().groups()
     """
     datestring_maybe = groups[1]
+    LOGGER.info('Got a datestring, maybe: "%s"', datestring_maybe)
     the_date = dateparser.parse(datestring_maybe)
     if not the_date:
         message.reply(f'"{datestring_maybe}" isn\'t a valid date, ya jerk!')
