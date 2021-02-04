@@ -10,6 +10,7 @@ import operator
 import yaml
 import slackbot.bot
 import peewee
+import psycopg2
 from playhouse.postgres_ext import PostgresqlExtDatabase
 from plugins import fakenumbers
 
@@ -152,18 +153,18 @@ def count_update(message, *groups):
         return
     except fakenumbers.NoNumberError:
         pass
-    with PSQL_DB.atomic():
-        try:
+    try:
+        with PSQL_DB.atomic():
             count = Counts.create(key=key, count=0)
-        except peewee.IntegrityError:
-            PSQL_DB.connect() # not entirely sure why this is necessary but it is
-            count = Counts.get(Counts.key == key)
-        count.count += delta
-        count.save()
+    except (peewee.IntegrityError, psycopg2.errors.UniqueViolation):
+        # PSQL_DB.connect() # not entirely sure why this is necessary but it is
+        count = Counts.get(Counts.key == key)
+    count.count += delta
+    count.save()
     message.reply(f'{key} is now {count.count}')
 
-ARITHMETICSTRING = r'''^([\w\.-]+)\s
-                     ([+\-\*/])=\s
+ARITHMETICSTRING = r'''^([\w\.-]+)\s?
+                     ([+\-\*/])=\s?
                      (-?\d+)$'''
 ARITHMETIC = re.compile(ARITHMETICSTRING, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.listen_to(ARITHMETIC)
@@ -179,18 +180,19 @@ Examples: a += 3
             '-': operator.sub,
             '*': operator.mul,
             '/': operator.floordiv}[oper]
-    with PSQL_DB.atomic():
-        try:
+    try:
+        with PSQL_DB.atomic():
             count = Counts.create(key=key, count=0)
-        except peewee.IntegrityError:
-            PSQL_DB.connect() # not entirely sure why this is necessary but it is
-            count = Counts.get(Counts.key == key)
-        try:
+    except (peewee.IntegrityError, psycopg2.errors.UniqueViolation):
+        # PSQL_DB.connect() # not entirely sure why this is necessary but it is
+        count = Counts.get(Counts.key == key)
+    try:
+        with PSQL_DB.atomic():
             count.count = oper(count.count, int(amount))
-        except ZeroDivisionError:
-            message.reply('You can\'t divide by zero, stupid!')
-            return
-        count.save()
+            count.save()
+    except ZeroDivisionError:
+        message.reply('You can\'t divide by zero, stupid!')
+        return
     message.reply('%s is now %s' % (key, count.count))
 
 DELCOUNTSTRING = r'''delete\s
