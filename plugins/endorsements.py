@@ -20,8 +20,7 @@ DBUSER = CFG['dbuser']
 DBPASS = CFG['dbpass']
 DB = CFG['db']
 PSQL_DB = PostgresqlExtDatabase(DB, user=DBUSER, password=DBPASS)
-LOGGER = logging.getLogger(__name__)
-LOGGER.addHandler(logging.StreamHandler())
+LOGGER = logging.getLogger('slackbot.plugins.endorsements')
 
 class EndorsementError(Exception):
     """ Custom error
@@ -186,10 +185,30 @@ Example: @bot list endorsements for @user1234'''
      .send_message('@%s' % sender,
                    reply))
 
+VAX_STRING = r'''who\sis\svaccinated\??'''
+VAX_PAT = re.compile(VAX_STRING, re.I|re.X)
+@slackbot.bot.respond_to(VAX_PAT)
+def list_vax(msg, *groups):
+    '''@mention to list users who are vaccinated
+Example: @bot who is vaccinated'''
+    LOGGER.info('Got request to list "vaccinated" endorsements')
+    vaxd_users = []
+    user_endos = get_endorsements(msg)
+    for nick, endos in user_endos.items():
+        if 'vaccinated' in endos:
+            vaxd_users.append(nick)
+    reply = 'The following users have been endorsed for "vaccinated":\n```'
+    reply += '\n'.join(vaxd_users)
+    reply += '\n```'
+    msg.reply(reply)
+
+
+
 DEBUG = r'''.*'''
 DEBUGGER = re.compile(DEBUG, re.IGNORECASE|re.VERBOSE)
 @slackbot.bot.respond_to(DEBUGGER)
 def debug(msg):
     """ Dump all requests to logger/stdout
     """
-    LOGGER.info(msg.body)
+    LOGGER.info('DEBUG log - msg body: "%s"', msg.body)
+

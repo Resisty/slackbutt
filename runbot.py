@@ -9,6 +9,8 @@ logging.basicConfig()
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG = os.path.join(BASE_DIR, 'config.yml')
 LOGGER = logging.getLogger('slackbot')
+LOGGER.setLevel(logging.INFO)
+LOGGER.addHandler(logging.StreamHandler())
 
 def main():
     """ Main function
