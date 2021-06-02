@@ -24,6 +24,6 @@ slackbot==0.5.6
 slacker==0.14.0
 sseclient==0.0.24
 typed-ast==1.4.1
-urllib3==1.25.8
+urllib3==1.26.5
 websocket-client==0.57.0
 wrapt==1.11.2
