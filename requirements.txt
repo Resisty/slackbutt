@@ -2,7 +2,7 @@ astroid==2.3.3
 backports.ssl-match-hostname==3.7.0.1
 boto3==1.12.16
 botocore==1.15.16
-certifi==2019.11.28
+certifi==2022.12.7
 chardet==3.0.4
 docutils==0.15.2
 geojson==2.5.0
